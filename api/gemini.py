@@ -1,33 +1,43 @@
-from flask import Blueprint, request, jsonify
+import requests
 import os
 from dotenv import load_dotenv
-from google import genai
 
-# Load environment variables
+# Load environment variables from .env file
 load_dotenv()
 
-# Initialize client with API key from .env
-client = genai.Client(api_key=os.getenv("API_KEY"))
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-# Creating a blueprint for the Gemini API
-gemini_api = Blueprint('gemini_api', __name__, url_prefix='/api/gemini')
+def fetch_trivia_questions():
+    if not GEMINI_API_KEY:
+        return {"error": "API Key is missing from .env file"}
 
-# POST method to generate content using Gemini
-@gemini_api.route('', methods=['POST'])
-def generate_content():
-    """
-    Endpoint to generate AI-generated content using Gemini.
-    """
-    data = request.get_json()
-    prompt = data.get("prompt")
+    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key"  # Replace with the correct URL from Gemini API documentation
 
-    if not prompt:
-        return jsonify({"error": "Prompt is required"}), 400
+    headers = {
+        "Authorization": f"Bearer {GEMINI_API_KEY}",
+        "Content-Type": "application/json"
+    }
+
+    payload = {
+        "prompt": "Generate 5 multiple-choice trivia questions with 4 options each. Provide the correct answer. Format the response in JSON.",
+        "max_tokens": 500
+    }
 
     try:
-        response = client.models.generate_content(
-            model="gemini-2.0-flash", contents=prompt
-        )
-        return jsonify({"response": response.text}), 200
-    except Exception as e:
-        return jsonify({"error": f"Failed to generate content: {str(e)}"}), 500
+        response = requests.post(url, json=payload, headers=headers)
+        response.raise_for_status()  # Raises an HTTPError if the response was not successful
+
+        # If API responds with an error
+        if response.status_code != 200:
+            return {"error": f"API Error: {response.status_code}, {response.text}"}
+
+        return response.json()  # Return the JSON response if everything is fine
+    except requests.exceptions.HTTPError as http_err:
+        return {"error": f"HTTP error occurred: {http_err}"}
+    except Exception as err:
+        return {"error": f"Other error occurred: {err}"}
+
+# Example usage:
+if __name__ == "__main__":
+    trivia_questions = fetch_trivia_questions()
+    print(trivia_questions)
