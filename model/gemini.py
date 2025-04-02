@@ -1,9 +1,10 @@
 from flask import Flask, jsonify
-from flask_cors import CORS
 from api import fetch_trivia_questions  # Import the function
+from flask_cors import CORS
+
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for frontend access
+CORS(app, resources={r"/*": {"origins": "http://127.0.0.1:4887"}})
 
 @app.route('/get-questions', methods=['GET'])
 def get_questions():
@@ -11,4 +12,5 @@ def get_questions():
     return jsonify(questions)
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)  # Run on port 5000
+    app.run(debug=True, port=8887)  # Run Flask on port 8887
+
