@@ -23,7 +23,7 @@ def fetch_trivia_questions():
             {
                 "parts": [
                     {
-                        "text": "Generate 5 multiple-choice trivia questions with 4 options each. Provide the correct answer in a structured JSON format."
+                        "text": "Generate 5 multiple-choice trivia questions with 4 options each about DNA Provide the correct answer in a structured JSON format."
                     }
                 ]
             }
