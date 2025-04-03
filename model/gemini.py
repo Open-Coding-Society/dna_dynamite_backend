@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+from __init__ import app
 from api import fetch_trivia_questions  # Import the function
 from flask_cors import CORS
 
