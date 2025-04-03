@@ -23,7 +23,7 @@ def fetch_trivia_questions():
             {
                 "parts": [
                     {
-                        "text": "Generate 5 multiple-choice trivia questions with 4 options each about DNA Provide the correct answer in a structured JSON format."
+                        "text": "Generate 5 multiple-choice trivia questions with 4 options each about DNA. Provide the correct answer in a structured JSON format."
                     }
                 ]
             }
@@ -43,16 +43,16 @@ def fetch_trivia_questions():
         if text_response.startswith("```json"):
             text_response = text_response[7:-3].strip()
 
-        # Convert string to Python dictionary
-        trivia_data = json.loads(text_response)
+        # Convert string to Python dictionary safely
+        try:
+            trivia_data = json.loads(text_response)
+        except json.JSONDecodeError:
+            return {"error": "Failed to parse response as JSON"}
 
         return trivia_data  # Return properly formatted JSON
 
-    except requests.exceptions.HTTPError as http_err:
-        return {"error": f"HTTP error occurred: {http_err}"}
+    except requests.exceptions.RequestException as req_err:
+        return {"error": f"Request error: {req_err}"}
     except Exception as err:
-        return {"error": f"Other error occurred: {err}"}
+        return {"error": f"Unexpected error: {err}"}
 
-# Example usage
-trivia_questions = fetch_trivia_questions()
-print(json.dumps(trivia_questions, indent=2))
