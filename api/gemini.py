@@ -34,7 +34,7 @@ def fetch_dna_question():
             {
                 "parts": [
                     {
-                        "text": "Generate a single multiple-choice trivia question about DNA or genetics with 4 options. Provide the correct answer in JSON format."
+                        "text": "Generate a single multiple-choice trivia question about DNA or genetics with A, B, C, D, answer options. Provide the question, the anwser choices, the correct answer A, B, C, or D, and an explanation for the answer in JSON format. Change the correct answer choice every time. Vary the questions slightly"
                     }
                 ]
             }
