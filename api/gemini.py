@@ -16,10 +16,10 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 @gemini_api.route("/geneticstrivia", methods=["POST", "GET"])
 def get_dna_question():
     """API endpoint to fetch a DNA/genetics trivia question"""
-    if request.method == "POST":
+    if request.method == "GET":
         return jsonify(fetch_dna_question())
     else:
-        return jsonify({"message": "Use a POST request to generate a DNA/genetics trivia question."})
+        return jsonify({"message": "Use a GET request to generate a DNA/genetics trivia question."})
 
 def fetch_dna_question():
     """Fetches a multiple-choice question about DNA or genetics"""
