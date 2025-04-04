@@ -1,29 +1,40 @@
+from flask import Blueprint, Flask, request, jsonify
+from flask_restful import Api, Resource
+from __init__ import app
 import requests
 import os
 import json
 from dotenv import load_dotenv
 
+gemini_api = Blueprint('gemini_api', __name__, url_prefix='/api')
+api = Api(gemini_api)
+
 # Load environment variables
 load_dotenv()
-
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-def fetch_trivia_questions():
+@gemini_api.route("/geneticstrivia", methods=["POST", "GET"])
+def get_dna_question():
+    """API endpoint to fetch a DNA/genetics trivia question"""
+    if request.method == "POST":
+        return jsonify(fetch_dna_question())
+    else:
+        return jsonify({"message": "Use a POST request to generate a DNA/genetics trivia question."})
+
+def fetch_dna_question():
+    """Fetches a multiple-choice question about DNA or genetics"""
     if not GEMINI_API_KEY:
         return {"error": "API Key is missing from .env file"}
 
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
 
-    headers = {
-        "Content-Type": "application/json"
-    }
-
+    headers = {"Content-Type": "application/json"}
     payload = {
         "contents": [
             {
                 "parts": [
                     {
-                        "text": "Generate 5 multiple-choice trivia questions with 4 options each. Provide the correct answer in a structured JSON format."
+                        "text": "Generate a single multiple-choice trivia question about DNA or genetics with 4 options. Provide the correct answer in JSON format."
                     }
                 ]
             }
@@ -32,27 +43,24 @@ def fetch_trivia_questions():
 
     try:
         response = requests.post(url, json=payload, headers=headers)
-        response.raise_for_status()  # Raises an HTTPError for bad responses
+        response.raise_for_status()
 
         data = response.json()
-        
-        # Extract JSON string from the response
         text_response = data["candidates"][0]["content"]["parts"][0]["text"]
-        
-        # Remove Markdown-style JSON formatting (```json ... ```)
-        if text_response.startswith("```json"):
-            text_response = text_response[7:-3].strip()
 
-        # Convert string to Python dictionary
-        trivia_data = json.loads(text_response)
+        # Use regex to extract JSON from markdown block
+        import re
+        match = re.search(r"```json\s*(\{.*?\})\s*```", text_response, re.DOTALL)
+        if match:
+            json_string = match.group(1).strip()
+            return json.loads(json_string)
+        else:
+            return {"error": "Gemini did not return valid JSON in the expected format."}
 
-        return trivia_data  # Return properly formatted JSON
+    except requests.exceptions.RequestException as e:
+        return {"error": f"Request error: {e}"}
+    except json.JSONDecodeError as e:
+        return {"error": f"JSON decode error: {str(e)}"}
 
-    except requests.exceptions.HTTPError as http_err:
-        return {"error": f"HTTP error occurred: {http_err}"}
-    except Exception as err:
-        return {"error": f"Other error occurred: {err}"}
-
-# Example usage
-trivia_questions = fetch_trivia_questions()
-print(json.dumps(trivia_questions, indent=2))
+if __name__ == "__main__":
+    app.run(debug=True)
