@@ -34,7 +34,11 @@ def fetch_dna_question():
             {
                 "parts": [
                     {
+<<<<<<< HEAD
                         "text": "Generate a single multiple-choice trivia question about DNA or genetics with 4 options. Provide the correct answer in JSON format."
+=======
+                        "text": "Generate 5 multiple-choice trivia questions with 4 options each about DNA. Provide the correct answer in a structured JSON format."
+>>>>>>> refs/remotes/origin/main
                     }
                 ]
             }
@@ -48,6 +52,7 @@ def fetch_dna_question():
         data = response.json()
         text_response = data["candidates"][0]["content"]["parts"][0]["text"]
 
+<<<<<<< HEAD
         # Use regex to extract JSON from markdown block
         import re
         match = re.search(r"```json\s*(\{.*?\})\s*```", text_response, re.DOTALL)
@@ -56,11 +61,26 @@ def fetch_dna_question():
             return json.loads(json_string)
         else:
             return {"error": "Gemini did not return valid JSON in the expected format."}
+=======
+        # Convert string to Python dictionary safely
+        try:
+            trivia_data = json.loads(text_response)
+        except json.JSONDecodeError:
+            return {"error": "Failed to parse response as JSON"}
+>>>>>>> refs/remotes/origin/main
 
     except requests.exceptions.RequestException as e:
         return {"error": f"Request error: {e}"}
     except json.JSONDecodeError as e:
         return {"error": f"JSON decode error: {str(e)}"}
 
+<<<<<<< HEAD
 if __name__ == "__main__":
     app.run(debug=True)
+=======
+    except requests.exceptions.RequestException as req_err:
+        return {"error": f"Request error: {req_err}"}
+    except Exception as err:
+        return {"error": f"Unexpected error: {err}"}
+
+>>>>>>> refs/remotes/origin/main
