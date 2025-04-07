@@ -1,6 +1,9 @@
-from flask import Blueprint, Flask, request, jsonify
+from flask import Blueprint, Flask, request, jsonify, g
 from flask_restful import Api, Resource
-from __init__ import app
+from api.jwt_authorize import token_required
+# from model.gemini import TriviaResponse  
+from model.user import User
+from __init__ import app, db
 import requests
 import os
 import json
@@ -63,6 +66,27 @@ def fetch_dna_question():
         return {"error": f"JSON decode error: {json_err}"}
     except Exception as err:
         return {"error": f"Unexpected error: {err}"}
+    
+# @gemini_api.route("/geneticstrivia", methods=["POST"])
+# @token_required()
+# def save_trivia_response():
+#     data = request.json
+#     try:
+#         new_response = TriviaResponse(
+#             user_id=g.current_user,  # Must be set somewhere in your app context
+#             question=data["question"],
+#             answer_options=data["answer_options"],
+#             selected_answer=data["selected_answer"],
+#             correct_answer=data["correct_answer"],
+#             explanation=data["explanation"],
+#             is_correct=(data["selected_answer"] == data["correct_answer"])
+#         )
+#         db.session.add(new_response)
+#         db.session.commit()
+#         return jsonify({"message": "Response saved successfully"}), 201
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
+
 
 if __name__ == "__main__":
     app.run(debug=True)
