@@ -37,6 +37,7 @@ from model.channel import Channel, initChannels
 from model.post import Post, initPosts
 from model.nestPost import NestPost, initNestPosts # Justin added this, custom format for his website
 from model.vote import Vote, initVotes
+from model.gemini import TriviaQuestion
 # server only Views
 
 # register URIs for api endpoints
@@ -161,6 +162,7 @@ def generate_data():
     initPosts()
     initNestPosts()
     initVotes()
+    initTriviaQuestion() 
     
 # Backup the old database
 def backup_database(db_uri, backup_uri):
@@ -180,6 +182,7 @@ def extract_data():
         data['users'] = [user.read() for user in User.query.all()]
         data['sections'] = [section.read() for section in Section.query.all()]
         data['groups'] = [group.read() for group in Group.query.all()]
+        data['TriviaQuestions'] = [TriviaQuestion.read() for TriviaQuestion in TriviaQuestion.query.all()]
         data['channels'] = [channel.read() for channel in Channel.query.all()]
         data['posts'] = [post.read() for post in Post.query.all()]
     return data
@@ -196,7 +199,7 @@ def save_data_to_json(data, directory='backup'):
 # Load data from JSON files
 def load_data_from_json(directory='backup'):
     data = {}
-    for table in ['users', 'sections', 'groups', 'channels', 'posts']:
+    for table in ['users', 'sections', 'groups', 'channels', 'posts', 'TriviaQuestions']:
         with open(os.path.join(directory, f'{table}.json'), 'r') as f:
             data[table] = json.load(f)
     return data

@@ -1,6 +1,7 @@
 from flask import Blueprint, Flask, request, jsonify, g
 from flask_restful import Api, Resource
 from api.jwt_authorize import token_required
+from model.gemini import TriviaQuestion
 # from model.gemini import TriviaResponse  
 from model.user import User
 from __init__ import app, db
@@ -25,12 +26,11 @@ def get_dna_question():
         return jsonify({"message": "Use a GET request to generate a DNA/genetics trivia question."})
 
 def fetch_dna_question():
-    """Fetches a multiple-choice question about DNA or genetics"""
+    """Fetches a multiple-choice question about DNA or genetics and stores it in the database"""
     if not GEMINI_API_KEY:
         return {"error": "API Key is missing from .env file"}
 
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
-
     headers = {"Content-Type": "application/json"}
     payload = {
         "contents": [
@@ -54,11 +54,23 @@ def fetch_dna_question():
         # Use regex to extract JSON from markdown block
         import re
         match = re.search(r"```json\s*(\{.*?\})\s*```", text_response, re.DOTALL)
-        if match:
-            json_string = match.group(1).strip()
-            return json.loads(json_string)
-        else:
+        if not match:
             return {"error": "Gemini did not return valid JSON in the expected format."}
+
+        json_string = match.group(1).strip()
+        question_data = json.loads(json_string)
+
+        # Save to database
+        trivia = TriviaQuestion(
+            question=question_data["question"],
+            answer_options=question_data["answer_options"],
+            correct_answer=question_data["correct_answer"],
+            explanation=question_data["explanation"]
+        )
+        db.session.add(trivia)
+        db.session.commit()
+
+        return trivia.to_dict()
 
     except requests.exceptions.RequestException as req_err:
         return {"error": f"Request error: {req_err}"}
@@ -66,27 +78,6 @@ def fetch_dna_question():
         return {"error": f"JSON decode error: {json_err}"}
     except Exception as err:
         return {"error": f"Unexpected error: {err}"}
-    
-# @gemini_api.route("/geneticstrivia", methods=["POST"])
-# @token_required()
-# def save_trivia_response():
-#     data = request.json
-#     try:
-#         new_response = TriviaResponse(
-#             user_id=g.current_user,  # Must be set somewhere in your app context
-#             question=data["question"],
-#             answer_options=data["answer_options"],
-#             selected_answer=data["selected_answer"],
-#             correct_answer=data["correct_answer"],
-#             explanation=data["explanation"],
-#             is_correct=(data["selected_answer"] == data["correct_answer"])
-#         )
-#         db.session.add(new_response)
-#         db.session.commit()
-#         return jsonify({"message": "Response saved successfully"}), 201
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
-
 
 if __name__ == "__main__":
     app.run(debug=True)
