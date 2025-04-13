@@ -1,0 +1,118 @@
+{% extends "layouts/base.html" %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1>High Score Management</h1>
+
+    <table class="table table-striped" id="scoreTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>User ID</th>
+                <th>Score</th>
+                {% if current_user.role == 'Admin' %}
+                <th>Actions</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for score in high_scores_data %}
+            <tr>
+                <td>{{ score.id }}</td>
+                <td>{{ score.user_id }}</td>
+                <td>{{ score.score }}</td>
+                {% if current_user.role == 'Admin' %}
+                <td>
+                    <button class="btn btn-warning edit-btn" data-id="{{ score.user_id }}" data-score="{{ score.score }}">Edit</button>
+                    <button class="btn btn-danger delete-btn" data-id="{{ score.user_id }}">Delete</button>
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if current_user.role == 'Admin' %}
+    <script>
+        $(document).ready(function() {
+            $("#scoreTable").DataTable();
+
+            // Delete score
+            $(document).on("click", ".delete-btn", function() {
+                const userId = $(this).data("id");
+                if (confirm("Delete high score for this user?")) {
+                    fetch("/api/score/admin/delete", {
+                        method: "DELETE",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ user_id: userId })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        alert(data.message || "Score deleted.");
+                        location.reload();
+                    })
+                    .catch(err => console.error("Error:", err));
+                }
+            });
+
+            // Open modal to edit score
+            $(document).on("click", ".edit-btn", function() {
+                const userId = $(this).data("id");
+                const score = $(this).data("score");
+                $("#editUserId").val(userId);
+                $("#editScore").val(score);
+                $("#editScoreModal").modal("show");
+            });
+
+            // Save updated score
+            $("#saveScoreChanges").click(function() {
+                const userId = $("#editUserId").val();
+                const updatedScore = $("#editScore").val();
+
+                fetch("/api/score", {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        score: parseInt(updatedScore)
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    alert("Score updated successfully!");
+                    location.reload();
+                })
+                .catch(err => console.error("Error updating score:", err));
+            });
+        });
+    </script>
+
+    <!-- Modal for Editing Score -->
+    <div class="modal fade" id="editScoreModal" tabindex="-1" aria-labelledby="editScoreModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit High Score</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editUserId">
+                    <div class="form-group">
+                        <label for="editScore">Score</label>
+                        <input type="number" class="form-control" id="editScore" min="0">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button class="btn btn-success" id="saveScoreChanges">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block background %}{% endblock %}
