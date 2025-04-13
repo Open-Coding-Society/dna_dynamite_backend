@@ -43,6 +43,7 @@ app.register_blueprint(channel_api)
 app.register_blueprint(group_api)
 app.register_blueprint(section_api)
 app.register_blueprint(score_api)
+app.register_blueprint(gemini_api)
 
 # Tell Flask-Login the view function name of your login route
 login_manager.login_view = "login"
