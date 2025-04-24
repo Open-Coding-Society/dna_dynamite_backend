@@ -23,6 +23,7 @@ from api.group import group_api
 from api.section import section_api
 from api.gemini import gemini_api
 from api.scores import score_api
+from api.predict_disease import predict_api
 
 # database Initialization functions
 from model.user import User, initUsers
@@ -32,7 +33,9 @@ from model.channel import Channel, initChannels
 from model.post import Post, initPosts
 from model.nestPost import NestPost, initNestPosts # Justin added this, custom format for his website
 from model.vote import Vote, initVotes
+from model.high_score import HighScore
 from model.gemini import TriviaQuestion, TriviaResponse
+from model.predict_disease import DiseaseRiskModel
 # server only Views
 
 # register URIs for api endpoints
@@ -44,7 +47,7 @@ app.register_blueprint(group_api)
 app.register_blueprint(section_api)
 app.register_blueprint(score_api)
 app.register_blueprint(gemini_api)
-
+app.register_blueprint(predict_api)
 # Tell Flask-Login the view function name of your login route
 login_manager.login_view = "login"
 
@@ -151,8 +154,8 @@ def generate_data():
     initPosts()
     initNestPosts()
     initVotes()
-    initTriviaQuestion() 
-    initTriviaResponse()
+    # initTriviaQuestion() 
+    # initTriviaResponse()
     
 # Backup the old database
 def backup_database(db_uri, backup_uri):
