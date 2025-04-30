@@ -2,7 +2,6 @@ from flask import Blueprint, Flask, request, jsonify, g
 from flask_restful import Api, Resource
 from api.jwt_authorize import token_required
 from model.gemini import TriviaQuestion
-from model.gemini import TriviaResponse  
 from model.user import User
 from __init__ import app, db
 import requests
@@ -78,38 +77,34 @@ def fetch_dna_question():
         return {"error": f"JSON decode error: {json_err}"}
     except Exception as err:
         return {"error": f"Unexpected error: {err}"}
-
-if __name__ == "__main__":
-    app.run(debug=True)
     
-    
-@gemini_api.route("/submit_answer", methods=["POST"])
-def submit_answer():
-    """Records user's answer and whether it was correct."""
-    data = request.get_json()
+# @gemini_api.route("/submit_answer", methods=["POST"])
+# def submit_answer():
+#     """Records user's answer and whether it was correct."""
+#     data = request.get_json()
 
-    question_id = data.get("question_id")
-    selected_answer = data.get("selected_answer")
+#     question_id = data.get("question_id")
+#     selected_answer = data.get("selected_answer")
 
-    question = TriviaQuestion.query.get(question_id)
-    if not question:
-        return jsonify({"error": "Question not found"}), 404
+#     question = TriviaQuestion.query.get(question_id)
+#     if not question:
+#         return jsonify({"error": "Question not found"}), 404
 
-    is_correct = selected_answer.upper() == question.correct_answer.upper()
+#     is_correct = selected_answer.upper() == question.correct_answer.upper()
 
-    response = TriviaResponse(
-        question_id=question.id,
-        selected_answer=selected_answer.upper(),
-        is_correct=is_correct
-    )
-    db.session.add(response)
-    db.session.commit()
+#     response = TriviaResponse(
+#         question_id=question.id,
+#         selected_answer=selected_answer.upper(),
+#         is_correct=is_correct
+#     )
+#     db.session.add(response)
+#     db.session.commit()
 
-    return jsonify({
-        "message": "Answer recorded.",
-        "is_correct": is_correct,
-        "correct_answer": question.correct_answer,
-        "explanation": question.explanation
-    })
+#     return jsonify({
+#         "message": "Answer recorded.",
+#         "is_correct": is_correct,
+#         "correct_answer": question.correct_answer,
+#         "explanation": question.explanation
+#     })
 
 
