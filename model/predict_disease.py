@@ -4,6 +4,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.preprocessing import StandardScaler
 import joblib
+from sklearn.utils import resample
+
 
 class DiseaseRiskModel:
     def __init__(self):
@@ -26,17 +28,36 @@ class DiseaseRiskModel:
 
         return X, y
 
+
     def train_and_save_model(self):
         X, y = self.load_and_prepare_data()
 
+        # Combine labels into a single string to stratify on label combinations
+        combined = y.astype(str).agg('_'.join, axis=1)
+        data = pd.concat([X, y], axis=1)
+        data['label_combo'] = combined
+
+        # Find the smallest class size to downsample to
+        min_size = data['label_combo'].value_counts().min()
+
+        # Undersample each group to match the smallest group size
+        balanced_data = pd.concat([
+            resample(group, replace=False, n_samples=min_size, random_state=42)
+            for _, group in data.groupby('label_combo')
+        ])
+
+        X_balanced = balanced_data[self.shared_features]
+        y_balanced = balanced_data[["has_heart_disease", "has_stroke"]]
+
         self.scaler = StandardScaler()
-        X_scaled = self.scaler.fit_transform(X)
+        X_scaled = self.scaler.fit_transform(X_balanced)
 
         self.model = MultiOutputClassifier(RandomForestClassifier(random_state=42))
-        self.model.fit(X_scaled, y)
+        self.model.fit(X_scaled, y_balanced)
 
         joblib.dump(self.model, "multi_disease_model.pkl")
         joblib.dump(self.scaler, "scaler.pkl")
+
 
     def load_model(self):
         try:
