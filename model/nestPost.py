@@ -88,12 +88,12 @@ class NestPost(db.Model):
             "id": self.id,
             "title": self._title,
             "content": self._content,
-            "user_name": user.name if user else None,
-            "group_name": group.name if group else None,
-            # Review information as this may not work as this is a quick workaround
+            "user_name": user.name if user else "Unknown User",
+            "group_name": group.name if group else "Unknown Group",
             "image_url": self._image_url
         }
         return data
+
     
     def update(self):
         """
