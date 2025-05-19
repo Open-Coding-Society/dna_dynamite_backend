@@ -11,26 +11,32 @@ api = Api(predict_api)
 def predict_disease():
     """API endpoint to predict heart disease and stroke risk from user input"""
     try:
-        data = request.get_json()
+        data = request.get_json(force=True)
 
-        # Validate required keys based on the model
+        # Required input fields for prediction
         required_fields = [
             "age", "sex", "bmi", "weight", "blood_pressure",
             "heart_rate", "smoking_status", "cholesterol", "glucose"
         ]
-        for field in required_fields:
-            if field not in data:
-                return jsonify({"error": f"Missing field: {field}"}), 400
 
-        # Get prediction from model
+        # Check for missing fields
+        missing = [field for field in required_fields if field not in data]
+        if missing:
+            return jsonify({"error": f"Missing field(s): {', '.join(missing)}"}), 400
+
+        # Run prediction
         prediction = predict_diseases(data)
 
         return jsonify({
             "message": "Prediction successful",
-            "data": prediction
+            "data": {
+                "heart_disease_10yr_risk": round(prediction["heart_disease_10yr_risk"], 4),
+                "stroke_10yr_risk": round(prediction["stroke_10yr_risk"], 4)
+            }
         })
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
+        return jsonify({
+            "error": "Prediction failed",
+            "details": str(e)
+        }), 500
