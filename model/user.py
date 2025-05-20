@@ -508,7 +508,20 @@ def initUsers():
         u1 = User(name='Thomas Edison', uid=app.config['ADMIN_USER'], password=app.config['ADMIN_PASSWORD'], pfp='toby.png', car='toby_car.png', role="Admin")
         u2 = User(name='Grace Hopper', uid=app.config['DEFAULT_USER'], password=app.config['DEFAULT_PASSWORD'], pfp='hop.png')
         u3 = User(name='Nicholas Tesla', uid='niko', password='123niko', pfp='niko.png' )
-        users = [u1, u2, u3]
+        u4 = User(name='Albert Einstein', uid='alby', password='123alby', pfp='alby.png' )
+        u5 = User(name='Isaac Newton', uid='newt', password='123newt', pfp='newt.png' )
+        u6 = User(name='Marie Curie', uid='cures', password='123cures', pfp='curie.png' )
+        u7 = User(name='Risha Guha', uid='risha', password='123Risha!', pfp='risha.png' )
+        u8 = User(name='Soumini Kandula', uid='soumini', password='123Soumini!', pfp='soumini.png' )
+        u9 = User(name='Abby Manalo', uid='abby', password='123Abby!', pfp='abby.png' )
+        u10 = User(name='Ethan Zhou', uid='ethan', password='123Ethan!', pfp='ethan.png' )
+        u11 = User(name='Shriya Shah', uid='shriya', password='123Shriya!', pfp='shriya.jpeg' )
+        u12 = User(name='Gaheera Babbar', uid='gaheera', password='123Gaheera!', pfp='gaheera.png' )
+        u13 = User(name='Hannah Li', uid='hannah', password='123Hannah!', pfp='hannah.png' )
+        u14 = User(name='ABC DEF', uid='abcdef', password='password', pfp='toby.png' )
+
+
+        users = [u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11, u12, u13, u14]
         
         for user in users:
             try:
