@@ -33,7 +33,7 @@ from model.channel import Channel, initChannels
 from model.post import Post, initPosts
 from model.nestPost import NestPost, initNestPosts # Justin added this, custom format for his website
 from model.vote import Vote, initVotes
-from model.high_score import HighScore
+from model.high_score import HighScore, initScores
 from model.predict_disease import DiseaseRiskModel
 # server only Views
 
@@ -153,6 +153,7 @@ def generate_data():
     initPosts()
     initNestPosts()
     initVotes()
+    initScores()
     # initTriviaQuestion() 
     # initTriviaResponse()
     
@@ -236,4 +237,4 @@ app.cli.add_command(custom_cli)
 # this runs the flask application on the development server
 if __name__ == "__main__":
     # change name for testing
-    app.run(debug=True, host="0.0.0.0", port="8887")
+    app.run(debug=True, host="0.0.0.0", port="3434")

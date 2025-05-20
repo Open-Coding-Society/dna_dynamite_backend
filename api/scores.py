@@ -28,17 +28,24 @@ class ScoreAPI:
 
             # ✅ Check if this user already has a high score
             high_score = HighScore.query.filter_by(user_id=current_user.id).first()
+            high_score_updated = False  # New flag
 
             if high_score:
                 if new_score > high_score.score:
                     high_score.score = new_score
                     high_score.update()
+                    high_score_updated = True
+                    
             else:
                 # ✅ Create a new record if none exists
                 high_score = HighScore(user_id=current_user.id, score=new_score, channel_id=7)
                 high_score.create()
+                high_score_updated = True 
 
-            return jsonify(high_score.read())
+            return jsonify({
+                **high_score.read(),
+                "high_score_updated": high_score_updated  # 👈 Add this to response
+            })
 
 
     class _DeleteScore(Resource):
