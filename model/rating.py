@@ -11,11 +11,11 @@ class Rating(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     stars = db.Column(db.Integer, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('frostbytes.id'), nullable=False)    
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)    
     channel_id = db.Column(db.Integer, db.ForeignKey('channels.id'), nullable=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
-    user = relationship('Frostbyte')
+    user = relationship('User')
     channel = relationship('Channel', back_populates='channel_ratings')
 
     # Add unique constraint for user_id and channel_id combination
