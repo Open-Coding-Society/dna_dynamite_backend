@@ -63,9 +63,9 @@ with app.app_context():
     shriya = User.query.filter_by(_uid='shriya').first()
 
     scores = [
-        HighScore(user_id=risha.id, score=0),
-        HighScore(user_id=hannah.id, score=0),
-        HighScore(user_id=shriya.id, score=1)
+        HighScore(User=risha.id, score=0),
+        HighScore(User=hannah.id, score=0),
+        HighScore(User=shriya.id, score=1)
     ]
 
     for score in scores:
