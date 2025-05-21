@@ -40,6 +40,13 @@ class HighScore(db.Model):
             "score": self.score,
             "channel_id": self.channel_id,
         }
+def get_or_create_user(uid):
+    user = User.query.filter_by(_uid=uid).first()
+    if not user:
+        user = User(uid, uid, 'password')  # Fill with whatever is valid for your User model
+        db.session.add(user)
+        db.session.commit()
+    return user
 
 def initScores(): 
     """
@@ -55,21 +62,30 @@ Raises:
     IntegrityError: An error occurred when adding the tester data to the table.
 """
 with app.app_context():
-    """Create database and tables"""
-    db.create_all()
-    """Tester data for table"""
-    risha = User.query.filter_by(_uid='risha').first()
-    hannah = User.query.filter_by(_uid='hannah').first()
-    shriya = User.query.filter_by(_uid='shriya').first()
+        db.create_all()
 
-    scores = [
-        HighScore(User=risha.id, score=0),
-        HighScore(User=hannah.id, score=0),
-        HighScore(User=shriya.id, score=1)
-    ]
+        # Get or create test users
+        risha = get_or_create_user('risha')
+        hannah = get_or_create_user('hannah')
+        shriya = get_or_create_user('shriya')
 
-    for score in scores:
-        try:
-            score.create()
-        except IntegrityError:
-            db.session.rollback()
+        # Add high scores
+        scores = [
+            HighScore(user_id=risha.id, score=0),
+            HighScore(user_id=hannah.id, score=0),
+            HighScore(user_id=shriya.id, score=1)
+        ]
+
+        for score in scores:
+            try:
+                score.create()
+            except IntegrityError:
+                db.session.rollback()
+
+
+
+
+
+
+
+
