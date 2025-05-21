@@ -18,7 +18,13 @@ class ScoreAPI:
         
 
     class _AllUsersScore(Resource):
-        
+        def get(self):
+            scores = HighScore.query.all()
+            if not scores:
+                return jsonify([])
+
+            all_scores = [score.read() for score in scores]
+            return jsonify(all_scores)
 
 
     class _UpdateScore(Resource):
