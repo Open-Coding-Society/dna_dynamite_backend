@@ -15,6 +15,11 @@ class ScoreAPI:
             if not score:
                 return jsonify({"score": 0})
             return jsonify(score.read())
+        
+
+    class _AllUsersScore(Resource):
+        
+
 
     class _UpdateScore(Resource):
         @token_required()
