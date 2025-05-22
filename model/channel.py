@@ -157,7 +157,10 @@ def initChannels():
             Channel(name='Announcements', group_id=general.id),
             Channel(name='Events', group_id=general.id),
             Channel(name='FAQ', group_id=support.id),
-            Channel(name='Help Desk', group_id=support.id)
+            Channel(name='Help Desk', group_id=support.id),
+            Channel(name='Report a bug', group_id=general.id),
+            Channel(name='Suggestions', group_id=general.id),
+            Channel(name='Reviews', group_id=general.id)
         ]
         
         # Vote for the GOAT channels below:
