@@ -15,6 +15,17 @@ class ScoreAPI:
             if not score:
                 return jsonify({"score": 0})
             return jsonify(score.read())
+        
+
+    class _AllUsersScore(Resource):
+        def get(self):
+            scores = HighScore.query.all()
+            if not scores:
+                return jsonify([])
+
+            all_scores = [score.read() for score in scores]
+            return jsonify(all_scores)
+
 
     class _UpdateScore(Resource):
         @token_required()
@@ -64,5 +75,6 @@ class ScoreAPI:
             return {"message": "Score deleted"}, 200
 
 api.add_resource(ScoreAPI._UserScore, '/score/user')
+api.add_resource(ScoreAPI._AllUsersScore, '/score/all_users')
 api.add_resource(ScoreAPI._UpdateScore, '/score')
 api.add_resource(ScoreAPI._DeleteScore, '/score/admin/delete')
