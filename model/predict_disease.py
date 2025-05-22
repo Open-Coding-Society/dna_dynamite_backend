@@ -51,12 +51,12 @@ class DiseaseRiskModel:
             self.train_and_save_model()
 
     def predict(self, user_input):
-        # Prepare input for ML model
+        # input for ML model
         input_df = pd.DataFrame([user_input])[self.shared_features]
         input_scaled = self.scaler.transform(input_df)
         model_pred = self.model.predict(input_scaled)[0]
 
-        # Formula-based risk estimation
+        # Formula-based risk estimation from Framingham Heart Study 
         def calc_heart_disease_risk(features):
             risk = (
                 0.0015 * (features["age"] - 20) +
@@ -102,7 +102,7 @@ def predict_diseases(user_input):
     return disease_model.predict(user_input)
 
 
-# Uncomment for standalone test
+# Uncomment for standalone test with average values
 # if __name__ == "__main__":
 #     test_input = {
 #         "age": 52,
