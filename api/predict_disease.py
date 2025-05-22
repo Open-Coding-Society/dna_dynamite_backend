@@ -24,13 +24,13 @@ def predict_disease():
         if missing:
             return jsonify({"error": f"Missing field(s): {', '.join(missing)}"}), 400
 
-        # Run prediction
+        # Run prediction, ouput test 
         prediction = predict_diseases(data)
 
         return jsonify({
             "message": "Prediction successful",
             "data": {
-                "heart_disease_10yr_risk": round(prediction["heart_disease_10yr_risk"], 4),
+                "heart_disease_10yr_risk": round(prediction["heart_disease_10yr_risk"], 4), # changed backend variable name, modify on frontend too
                 "stroke_10yr_risk": round(prediction["stroke_10yr_risk"], 4)
             }
         })
