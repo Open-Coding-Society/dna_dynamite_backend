@@ -12,9 +12,11 @@ class HighScore(db.Model):
     __tablename__ = 'high_scores'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, unique=True, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # ✅ FIXED
     score = db.Column(db.Integer, default=0)
     channel_id = db.Column(db.Integer, default=7)  # ✅ link to High Scores channel
+    
+    user = relationship("User", backref="high_scores")
 
     def __init__(self, user_id, score=0, channel_id=7):
         self.user_id = user_id
@@ -39,6 +41,7 @@ class HighScore(db.Model):
             "user_id": self.user_id,
             "score": self.score,
             "channel_id": self.channel_id,
+            "name": self.user.name if self.user else "Unknown"  # 👈 Add name here
         }
 def get_or_create_user(uid):
     user = User.query.filter_by(_uid=uid).first()
