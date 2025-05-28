@@ -2,6 +2,10 @@ from flask import Blueprint, request, jsonify, g
 from flask_restful import Api, Resource
 from model.high_score import HighScore
 from api.jwt_authorize import token_required
+from sqlalchemy.sql import func  
+from model.user import User 
+from __init__ import db
+
 
 score_api = Blueprint('score_api', __name__, url_prefix='/api')
 api = Api(score_api)
@@ -18,13 +22,28 @@ class ScoreAPI:
         
 
     class _AllUsersScore(Resource):
-        def get(self):
-            scores = HighScore.query.all()
-            if not scores:
-                return jsonify([])
+            def get(self):
+                # ✅ updated logic to get only highest score per user
+                grouped_scores = (
+                    db.session.query(
+                        HighScore.user_id,
+                        func.max(HighScore.score).label("score")
+                    )
+                    .group_by(HighScore.user_id)
+                    .order_by(func.max(HighScore.score).desc())
+                    .all()
+                )
 
-            all_scores = [score.read() for score in scores]
-            return jsonify(all_scores)
+                results = []
+                for user_id, score in grouped_scores:
+                    user = User.query.get(user_id)
+                    results.append({
+                        "name": user.name if user else "Unknown",
+                        "user_id": user_id,
+                        "score": score
+                    })
+
+                return jsonify(results)
 
 
     class _UpdateScore(Resource):
